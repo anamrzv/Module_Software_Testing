@@ -4,14 +4,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DijkstraTest {
 
     private static Graph smallGraph;
     private static Graph bigGraph;
-    private static int smallGraphSize = 8;
-    private static int bigGraphSize = 18;
+    private static final int smallGraphSize = 8;
+    private static final int bigGraphSize = 18;
 
     @BeforeEach
     public void init() {
@@ -128,9 +128,8 @@ public class DijkstraTest {
         var vertices = smallGraph.getVertices();
         for (Vertex startingVertex : vertices) {
             smallGraph.setToDefault();
-            smallGraph.setStartingVertex(startingVertex);
 
-            int[] actualShortestPaths = smallGraph.printShortestPaths();
+            int[] actualShortestPaths = smallGraph.printShortestPaths(startingVertex);
             assertArrayEquals(expectedAllShortestPaths[vertices.indexOf(startingVertex)], actualShortestPaths, "Fail at vertex " + vertices.indexOf(startingVertex));
 
             var actualPreviousVerticesInPaths = smallGraph.getPreviousVerticesInPaths();
@@ -186,14 +185,85 @@ public class DijkstraTest {
         var vertices = bigGraph.getVertices();
         for (Vertex startingVertex : vertices) {
             bigGraph.setToDefault();
-            bigGraph.setStartingVertex(startingVertex);
 
-            int[] actualShortestPaths = bigGraph.printShortestPaths();
+            int[] actualShortestPaths = bigGraph.printShortestPaths(startingVertex);
             assertArrayEquals(expectedAllShortestPaths[vertices.indexOf(startingVertex)], actualShortestPaths, "Fail at vertex " + vertices.indexOf(startingVertex));
 
             var actualPreviousVerticesInPaths = bigGraph.getPreviousVerticesInPaths();
             assertArrayEquals(expectedPreviousVerticesInPaths[vertices.indexOf(startingVertex)], actualPreviousVerticesInPaths, "Fail at vertex " + vertices.indexOf(startingVertex));
         }
     }
+
+    @Test
+    @DisplayName("Should not create empty graph")
+    public void testEmptyGraph() {
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Graph(0),
+                "Expected new Graph(0) to throw exception, but it didn't"
+        );
+
+        assertTrue(thrown.getMessage().contentEquals("В графе должна быть хотя бы одна вершина"));
+    }
+
+    @Test
+    @DisplayName("Should work with graph with 1 vertex")
+    public void testGraphWithOneVertex() {
+        Graph graph = new Graph(1);
+        int[] expected = {0};
+        var v0 = graph.addVertex("0");
+
+        int[] actualShortestPaths = graph.printShortestPaths(v0);
+        assertArrayEquals(expected, actualShortestPaths);
+
+        var actualPreviousVerticesInPaths = graph.getPreviousVerticesInPaths();
+        assertArrayEquals(expected, actualPreviousVerticesInPaths);
+    }
+
+    @Test
+    @DisplayName("Should work with isolated vertices")
+    public void testGraphWithIsolatedVertices() {
+        Graph graph = new Graph(3);
+        int[][] expected = {
+                {0, Integer.MAX_VALUE, Integer.MAX_VALUE},
+                {Integer.MAX_VALUE, 0, Integer.MAX_VALUE},
+                {Integer.MAX_VALUE, Integer.MAX_VALUE, 0}
+        };
+        int[][] expectedPrev = {
+                {0, -1, -1},
+                {-1, 1, -1},
+                {-1, -1, 2}
+        };
+        var g0 = graph.addVertex("a");
+        var g1 = graph.addVertex("b");
+        var g2 = graph.addVertex("c");
+
+        assertArrayEquals(expected[0], graph.printShortestPaths(g0));
+        assertArrayEquals(expectedPrev[0], graph.getPreviousVerticesInPaths());
+
+        graph.setToDefault();
+        assertArrayEquals(expected[1], graph.printShortestPaths(g1));
+        assertArrayEquals(expectedPrev[1], graph.getPreviousVerticesInPaths());
+
+        graph.setToDefault();
+        assertArrayEquals(expected[2], graph.printShortestPaths(g2));
+        assertArrayEquals(expectedPrev[2], graph.getPreviousVerticesInPaths());
+    }
+
+    @Test
+    @DisplayName("Should throw error when number of vertexes isn't correct")
+    public void testInvalidGraph() {
+        Graph graph = new Graph(5);
+        var v0 = graph.addVertex("0");
+
+        IllegalStateException thrown = assertThrows(
+                IllegalStateException.class,
+                () -> graph.printShortestPaths(v0),
+                "Expected graph.printShortestPaths()) to throw exception, but it didn't"
+        );
+
+        assertTrue(thrown.getMessage().contentEquals("Число созданных вершин не совпадает с заявленным"));
+    }
+
 
 }

@@ -8,9 +8,10 @@ public class Graph {
     private final ArrayList<Vertex> vertices;
     private final int[][] connections;
     private int[] shortestPaths;
-    private int startingVertexIndex;
+    private int startingVertexIndex = -1;
 
     public Graph(int vertexNum) {
+        if (vertexNum <= 0) throw new IllegalArgumentException("В графе должна быть хотя бы одна вершина");
         MAX_VERTS = vertexNum;
         vertices = new ArrayList<>();
         connections = new int[MAX_VERTS][MAX_VERTS];
@@ -23,7 +24,7 @@ public class Graph {
         }
     }
 
-    public void setStartingVertex(Vertex from) {
+    private void setStartingVertex(Vertex from) {
         int index = vertices.indexOf(from);
         shortestPaths[index] = 0;
         from.setLastVertexIndex(index);
@@ -92,7 +93,10 @@ public class Graph {
         }
     }
 
-    public int[] printShortestPaths() {
+    public int[] printShortestPaths(Vertex from) {
+        if (MAX_VERTS != vertices.size())
+            throw new IllegalStateException("Число созданных вершин не совпадает с заявленным");
+        setStartingVertex(from);
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(new VertexComparator());
         priorityQueue.add(vertices.get(startingVertexIndex));
         dijkstra(priorityQueue);
