@@ -60,7 +60,7 @@ public class Graph {
         return previousVerticesInPaths;
     }
 
-    public void setToDefault() {
+    private void setToDefault() {
         vertices.forEach((v) -> v.setInvestigated(false));
         vertices.forEach((v) -> v.setLastDistance(-1));
         vertices.forEach((v) -> v.setLastVertexIndex(-1));
@@ -94,8 +94,12 @@ public class Graph {
     }
 
     public int[] printShortestPaths(Vertex from) {
+        if (from == null) throw new IllegalArgumentException("Начальная вершина не проинициализирована");
+        if (!vertices.contains(from)) throw new IllegalArgumentException("Начальная вершина не содержится в графе");
         if (MAX_VERTS != vertices.size())
             throw new IllegalStateException("Число созданных вершин не совпадает с заявленным");
+
+        setToDefault();
         setStartingVertex(from);
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(new VertexComparator());
         priorityQueue.add(vertices.get(startingVertexIndex));

@@ -8,15 +8,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DijkstraTest {
 
-    private static Graph smallGraph;
-    private static Graph bigGraph;
     private static final int smallGraphSize = 8;
     private static final int bigGraphSize = 18;
 
-    @BeforeEach
-    public void init() {
-        smallGraph = new Graph(smallGraphSize);
-
+    @Test
+    @DisplayName("Should find the right shortest paths from all of the vertices to another ones for small graph")
+    public void testSmallGraphWithDifferentStartingVertex() {
+        Graph smallGraph = new Graph(smallGraphSize);
         var v0 = smallGraph.addVertex("0");
         var v1 = smallGraph.addVertex("1");
         var v2 = smallGraph.addVertex("2");
@@ -36,7 +34,42 @@ public class DijkstraTest {
         smallGraph.addEdge(v4, v2, 9);
         smallGraph.addEdge(v4, v0, 8);
 
-        bigGraph = new Graph(bigGraphSize);
+        int[][] expectedAllShortestPaths = {
+                {0, 18, 17, Integer.MAX_VALUE, 8, 17, 15, 13},
+                {18, 0, 10, Integer.MAX_VALUE, 10, 5, 3, 5},
+                {17, 10, 0, Integer.MAX_VALUE, 9, 9, 7, 9},
+                {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE},
+                {8, 10, 9, Integer.MAX_VALUE, 0, 9, 7, 5},
+                {17, 5, 9, Integer.MAX_VALUE, 9, 0, 2, 4},
+                {15, 3, 7, Integer.MAX_VALUE, 7, 2, 0, 2},
+                {13, 5, 9, Integer.MAX_VALUE, 5, 4, 2, 0}
+        };
+
+        int[][] expectedPreviousVerticesInPaths = {
+                {0, 6, 4, -1, 0, 6, 7, 4},
+                {4, 1, 6, -1, 7, 6, 1, 6},
+                {4, 6, 2, -1, 2, 6, 2, 6},
+                {-1, -1, -1, 3, -1, -1, -1, -1},
+                {4, 6, 4, -1, 4, 6, 7, 4},
+                {4, 6, 6, -1, 7, 5, 5, 6},
+                {4, 6, 6, -1, 7, 6, 6, 6},
+                {4, 6, 6, -1, 7, 6, 7, 7}
+        };
+
+        var vertices = smallGraph.getVertices();
+        for (Vertex startingVertex : vertices) {
+            int[] actualShortestPaths = smallGraph.printShortestPaths(startingVertex);
+            assertArrayEquals(expectedAllShortestPaths[vertices.indexOf(startingVertex)], actualShortestPaths, "Fail at vertex " + vertices.indexOf(startingVertex));
+
+            var actualPreviousVerticesInPaths = smallGraph.getPreviousVerticesInPaths();
+            assertArrayEquals(expectedPreviousVerticesInPaths[vertices.indexOf(startingVertex)], actualPreviousVerticesInPaths);
+        }
+    }
+
+    @Test
+    @DisplayName("Should find the right shortest paths from all of the vertices to another ones for big graph")
+    public void testBigGraphWithDifferentStartingVertex() {
+        Graph bigGraph = new Graph(bigGraphSize);
 
         var g0 = bigGraph.addVertex("0");
         var g1 = bigGraph.addVertex("1");
@@ -67,79 +100,28 @@ public class DijkstraTest {
         bigGraph.addEdge(g3, g10, 6);
         bigGraph.addEdge(g3, g17, 9);
         bigGraph.addEdge(g4, g7, 5);
-
         bigGraph.addEdge(g5, g2, 1);
         bigGraph.addEdge(g5, g6, 7);
         bigGraph.addEdge(g5, g9, 1);
         bigGraph.addEdge(g5, g8, 1);
-
         bigGraph.addEdge(g6, g9, 9);
-
         bigGraph.addEdge(g7, g8, 2);
         bigGraph.addEdge(g7, g14, 9);
-
         bigGraph.addEdge(g8, g9, 9);
         bigGraph.addEdge(g8, g12, 8);
         bigGraph.addEdge(g8, g11, 4);
-
         bigGraph.addEdge(g9, g12, 4);
         bigGraph.addEdge(g9, g10, 9);
         bigGraph.addEdge(g9, g13, 3);
-
         bigGraph.addEdge(g10, g17, 6);
         bigGraph.addEdge(g10, g13, 3);
-
         bigGraph.addEdge(g11, g15, 8);
-
         bigGraph.addEdge(g12, g15, 5);
         bigGraph.addEdge(g12, g16, 7);
-
         bigGraph.addEdge(g13, g17, 5);
         bigGraph.addEdge(g13, g16, 8);
-
         bigGraph.addEdge(g15, g16, 3);
-    }
 
-    @Test
-    @DisplayName("Should find the right shortest paths from all of the vertices to another ones for small graph")
-    public void testSmallGraphWithDifferentStartingVertex() {
-        int[][] expectedAllShortestPaths = {
-                {0, 18, 17, Integer.MAX_VALUE, 8, 17, 15, 13},
-                {18, 0, 10, Integer.MAX_VALUE, 10, 5, 3, 5},
-                {17, 10, 0, Integer.MAX_VALUE, 9, 9, 7, 9},
-                {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE},
-                {8, 10, 9, Integer.MAX_VALUE, 0, 9, 7, 5},
-                {17, 5, 9, Integer.MAX_VALUE, 9, 0, 2, 4},
-                {15, 3, 7, Integer.MAX_VALUE, 7, 2, 0, 2},
-                {13, 5, 9, Integer.MAX_VALUE, 5, 4, 2, 0}
-        };
-
-        int[][] expectedPreviousVerticesInPaths = {
-                {0, 6, 4, -1, 0, 6, 7, 4},
-                {4, 1, 6, -1, 7, 6, 1, 6},
-                {4, 6, 2, -1, 2, 6, 2, 6},
-                {-1, -1, -1, 3, -1, -1, -1, -1},
-                {4, 6, 4, -1, 4, 6, 7, 4},
-                {4, 6, 6, -1, 7, 5, 5, 6},
-                {4, 6, 6, -1, 7, 6, 6, 6},
-                {4, 6, 6, -1, 7, 6, 7, 7}
-        };
-
-        var vertices = smallGraph.getVertices();
-        for (Vertex startingVertex : vertices) {
-            smallGraph.setToDefault();
-
-            int[] actualShortestPaths = smallGraph.printShortestPaths(startingVertex);
-            assertArrayEquals(expectedAllShortestPaths[vertices.indexOf(startingVertex)], actualShortestPaths, "Fail at vertex " + vertices.indexOf(startingVertex));
-
-            var actualPreviousVerticesInPaths = smallGraph.getPreviousVerticesInPaths();
-            assertArrayEquals(expectedPreviousVerticesInPaths[vertices.indexOf(startingVertex)], actualPreviousVerticesInPaths);
-        }
-    }
-
-    @Test
-    @DisplayName("Should find the right shortest paths from all of the vertices to another ones for big graph")
-    public void testBigGraphWithDifferentStartingVertex() {
         int[][] expectedAllShortestPaths = {
                 {0, 1, 8, 22, 4, 9, 13, 8, 10, 10, 16, 14, 14, 13, 17, 19, 21, 18},
                 {1, 0, 9, 23, 5, 10, 14, 9, 11, 11, 17, 15, 15, 14, 18, 20, 22, 19},
@@ -184,8 +166,6 @@ public class DijkstraTest {
 
         var vertices = bigGraph.getVertices();
         for (Vertex startingVertex : vertices) {
-            bigGraph.setToDefault();
-
             int[] actualShortestPaths = bigGraph.printShortestPaths(startingVertex);
             assertArrayEquals(expectedAllShortestPaths[vertices.indexOf(startingVertex)], actualShortestPaths, "Fail at vertex " + vertices.indexOf(startingVertex));
 
@@ -195,15 +175,22 @@ public class DijkstraTest {
     }
 
     @Test
-    @DisplayName("Should not create empty graph")
-    public void testEmptyGraph() {
-        IllegalArgumentException thrown = assertThrows(
+    @DisplayName("Should not create empty graph or graph with negative number og vertices")
+    public void testEmptyOrNegativeGraph() {
+        IllegalArgumentException thrownEmpty = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Graph(0),
                 "Expected new Graph(0) to throw exception, but it didn't"
         );
 
-        assertTrue(thrown.getMessage().contentEquals("В графе должна быть хотя бы одна вершина"));
+        IllegalArgumentException thrownNeg = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Graph(-4),
+                "Expected new Graph(-4) to throw exception, but it didn't"
+        );
+
+        assertTrue(thrownEmpty.getMessage().contentEquals("В графе должна быть хотя бы одна вершина"));
+        assertTrue(thrownNeg.getMessage().contentEquals("В графе должна быть хотя бы одна вершина"));
     }
 
     @Test
@@ -241,18 +228,16 @@ public class DijkstraTest {
         assertArrayEquals(expected[0], graph.printShortestPaths(g0));
         assertArrayEquals(expectedPrev[0], graph.getPreviousVerticesInPaths());
 
-        graph.setToDefault();
         assertArrayEquals(expected[1], graph.printShortestPaths(g1));
         assertArrayEquals(expectedPrev[1], graph.getPreviousVerticesInPaths());
 
-        graph.setToDefault();
         assertArrayEquals(expected[2], graph.printShortestPaths(g2));
         assertArrayEquals(expectedPrev[2], graph.getPreviousVerticesInPaths());
     }
 
     @Test
     @DisplayName("Should throw error when number of vertexes isn't correct")
-    public void testInvalidGraph() {
+    public void testInvalidVerticesNumberGraph() {
         Graph graph = new Graph(5);
         var v0 = graph.addVertex("0");
 
@@ -265,5 +250,40 @@ public class DijkstraTest {
         assertTrue(thrown.getMessage().contentEquals("Число созданных вершин не совпадает с заявленным"));
     }
 
+    @Test
+    @DisplayName("Should throw error when starting vertex is null")
+    public void testNullStartingVertexGraph() {
+        Graph graph = new Graph(2);
+        graph.addVertex("0");
+        graph.addVertex("1");
+
+        Vertex invalid = null;
+
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> graph.printShortestPaths(invalid),
+                "Expected graph.printShortestPaths(null)) to throw exception, but it didn't"
+        );
+
+        assertTrue(thrown.getMessage().contentEquals("Начальная вершина не проинициализирована"));
+    }
+
+    @Test
+    @DisplayName("Should throw error when starting vertex isn't contained in graph")
+    public void testInvalidStartingVertexGraph() {
+        Graph graph = new Graph(2);
+        graph.addVertex("0");
+        graph.addVertex("1");
+
+        Vertex invalid = new Vertex("invalid");
+
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> graph.printShortestPaths(invalid),
+                "Expected graph.printShortestPaths(invalid)) to throw exception, but it didn't"
+        );
+
+        assertTrue(thrown.getMessage().contentEquals("Начальная вершина не содержится в графе"));
+    }
 
 }
