@@ -1,6 +1,5 @@
 package part2;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -284,6 +283,21 @@ public class DijkstraTest {
         );
 
         assertTrue(thrown.getMessage().contentEquals("Начальная вершина не содержится в графе"));
+    }
+
+    @Test
+    @DisplayName("Should throw error when adding vertex with same name")
+    public void testSameNameVertexGraph() {
+        Graph graph = new Graph(2);
+        graph.addVertex("0");
+
+        RuntimeException thrown = assertThrows(
+                RuntimeException.class,
+                () -> graph.addVertex("0"),
+                "Expected graph.addVertex(\"0\") to throw exception, but it didn't"
+        );
+
+        assertTrue(thrown.getMessage().contentEquals("Вершина с таким названием уже существует в графе"));
     }
 
 }

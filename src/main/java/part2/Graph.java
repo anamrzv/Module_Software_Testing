@@ -43,6 +43,10 @@ public class Graph {
     }
 
     public Vertex addVertex(String name) {
+        for (Vertex v : vertices) {
+            if (v.getName().equals(name))
+                throw new RuntimeException("Вершина с таким названием уже существует в графе");
+        }
         Vertex v = new Vertex(name);
         vertices.add(v);
         return v;

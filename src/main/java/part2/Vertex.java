@@ -1,7 +1,7 @@
 package part2;
 
 public class Vertex {
-    private String name;
+    private final String name;
     private boolean isInvestigated;
     private int lastVertexIndex;
     private int lastDistance;
