@@ -17,15 +17,4 @@ public class ArcTg {
             return sum;
         } else throw new UnsupportedOperationException("Функция действительна только для -1 <= x <= 1");
     }
-
-    public static double getPowerSeriesAny(double x, int steps) {
-        if (steps < 1) {
-            throw new UnsupportedOperationException("Функция действительна только для числа шагов от 1");
-        }
-        double sum = 0;
-        for (int n = 1; n <= steps; n++) {
-            sum += Math.pow(-1, n - 1) * (Math.pow(x, 2 * n - 1)) / (2 * n - 1);
-        }
-        return sum;
-    }
 }
