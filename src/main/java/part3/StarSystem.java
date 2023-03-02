@@ -4,9 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class StarSystem {
-    private Set<Star> stars;
-    private String name;
-    private int maxSize;
+    private final Set<Star> stars;
+    private final String name;
+    private final int maxSize;
 
     public StarSystem(String name, int maxSize) {
         if (maxSize < 0) throw new RuntimeException("Звездная система не может иметь отричательный размер");

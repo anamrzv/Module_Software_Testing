@@ -3,7 +3,6 @@ package part3;
 public abstract class CosmicBody implements Cosmic {
     private Color color;
     private Size size;
-
     private String name;
 
     public CosmicBody(Color color, Size size, String name) {
